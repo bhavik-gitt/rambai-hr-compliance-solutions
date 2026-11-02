@@ -50,7 +50,7 @@ export const sendEnquiryEmail = async (enquiry) => {
 
   await transporter.sendMail({
     from: `"RAMBAI Website" <${process.env.EMAIL_USER}>`,
-    to: "dhaval30303@gmail.com",
+    to: "info.rambai@gmail.com",
     replyTo: email,
     subject: `New Website Enquiry - ${fullName}`,
 
@@ -60,6 +60,7 @@ export const sendEnquiryEmail = async (enquiry) => {
         path: logoPath,
         cid: "rambaiLogo",
       },
+      
     ],
 
     text: `
