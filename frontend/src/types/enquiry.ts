@@ -9,7 +9,7 @@ export type Enquiry = {
   submittedAt: string
 }
 
-export type EnquiryDraft = Omit<Enquiry, 'submittedAt'>
+export type EnquiryDraft = Omit<Enquiry, "submittedAt">
 
 export type EnquiryField = keyof EnquiryDraft
 
