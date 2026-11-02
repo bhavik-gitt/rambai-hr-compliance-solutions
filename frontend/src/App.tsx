@@ -305,7 +305,7 @@ function FloatingActions() {
 }
 
 const titles: Record<string,string> = {
-  '/':'Premium HR & Compliance Consultancy','/about':'About Us','/services':'HR & Compliance Services','/registrations':'Registrations & Licensing','/insights':'Knowledge Centre','/contact':'Contact Us','/privacy-policy':'Privacy Policy','/terms-and-conditions':'Terms & Conditions'
+  '/':'HR & Compliance Consultancy','/about':'About Us','/services':'HR & Compliance Services','/registrations':'Registrations & Licensing','/insights':'Knowledge Centre','/contact':'Contact Us','/privacy-policy':'Privacy Policy','/terms-and-conditions':'Terms & Conditions'
 }
 
 function Router({ path }: { path: string }) {
