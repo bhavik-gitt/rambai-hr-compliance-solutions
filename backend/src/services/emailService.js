@@ -30,10 +30,19 @@ export const sendEnquiryEmail = async (enquiry) => {
     message,
   } = enquiry;
 
+  // Validate the customer's reply-to email.
+  const replyToEmail = String(email ?? "").trim().toLowerCase();
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailPattern.test(replyToEmail)) {
+    throw new Error("Invalid customer reply-to email address.");
+  }
+
   const safe = {
     fullName: escapeHtml(fullName),
     companyName: escapeHtml(companyName || "Not provided"),
-    email: escapeHtml(email),
+    email: escapeHtml(replyToEmail),
     phone: escapeHtml(phone),
     city: escapeHtml(city || "Not provided"),
     serviceRequired: escapeHtml(serviceRequired),
@@ -78,26 +87,50 @@ export const sendEnquiryEmail = async (enquiry) => {
 
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;width:35%;">Full Name</td>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;font-weight:bold;">${safe.fullName}</td>
-            </tr>
-            <tr>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">Company</td>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;">${safe.companyName}</td>
-            </tr>
-            <tr>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">Email</td>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;">
-                <a href="mailto:${safe.email}" style="color:#006b5c;text-decoration:none;">${safe.email}</a>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;width:35%;">
+                Full Name
+              </td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;font-weight:bold;">
+                ${safe.fullName}
               </td>
             </tr>
+
             <tr>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">Phone</td>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;">${safe.phone}</td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">
+                Company
+              </td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;">
+                ${safe.companyName}
+              </td>
             </tr>
+
             <tr>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">City</td>
-              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;">${safe.city}</td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">
+                Email
+              </td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;">
+                <a href="mailto:${safe.email}" style="color:#006b5c;text-decoration:none;">
+                  ${safe.email}
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">
+                Phone
+              </td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;">
+                ${safe.phone}
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#777;">
+                City
+              </td>
+              <td style="padding:11px 8px;border-bottom:1px solid #eeeeee;color:#222;">
+                ${safe.city}
+              </td>
             </tr>
           </table>
 
@@ -118,12 +151,15 @@ export const sendEnquiryEmail = async (enquiry) => {
           <p style="margin:0;color:#D4AF37;font-size:13px;font-weight:bold;">
             RAMBAI HR &amp; COMPLIANCE SOLUTIONS
           </p>
+
           <p style="margin:8px 0 0;color:#ffffff;font-size:12px;">
             People • Compliance • Progress
           </p>
+
           <p style="margin:8px 0 0;color:#cccccc;font-size:11px;">
             Ahmedabad, Gujarat, India
           </p>
+
           <p style="margin:12px 0 0;color:#aaaaaa;font-size:10px;">
             Automated notification from the RAMBAI website.
           </p>
@@ -139,7 +175,7 @@ New Website Enquiry
 
 Name: ${fullName}
 Company: ${companyName || "Not provided"}
-Email: ${email}
+Email: ${replyToEmail}
 Phone: ${phone}
 City: ${city || "Not provided"}
 Service: ${serviceRequired}
@@ -148,43 +184,60 @@ Message:
 ${message}
   `;
 
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "api-key": apiKey,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      sender: {
-        name: "RAMBAI Website",
-        email: senderEmail,
+  const response = await fetch(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": apiKey,
+        "content-type": "application/json",
       },
-      to: [
-        {
-          email: "info.rambai@gmail.com",
-          name: "RAMBAI",
+      body: JSON.stringify({
+        sender: {
+          name: "RAMBAI Website",
+          email: senderEmail,
         },
-      ],
-      replyTo: {
-        email,
-        name: fullName,
-      },
-      subject: `New Website Enquiry - ${fullName}`,
-      htmlContent,
-      textContent,
-    }),
-    signal: AbortSignal.timeout(15000),
-  });
+
+        to: [
+          {
+            email: "info.rambai@gmail.com",
+            name: "RAMBAI",
+          },
+        ],
+
+        replyTo: {
+          email: replyToEmail,
+          name: String(fullName ?? "").trim(),
+        },
+
+        subject: `New Website Enquiry - ${String(fullName).trim()}`,
+        htmlContent,
+        textContent,
+      }),
+
+      signal: AbortSignal.timeout(15000),
+    }
+  );
 
   if (!response.ok) {
     const errorDetails = await response.text();
-    console.error("Brevo API error:", response.status, errorDetails);
+
+    console.error(
+      "Brevo API error:",
+      response.status,
+      errorDetails
+    );
+
     throw new Error("Unable to send enquiry email.");
   }
 
   const result = await response.json();
-  console.log("Enquiry email accepted by Brevo:", result.messageId);
+
+  console.log(
+    "Enquiry email accepted by Brevo:",
+    result.messageId
+  );
 
   return result;
 };
