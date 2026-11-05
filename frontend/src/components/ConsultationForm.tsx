@@ -150,7 +150,6 @@ Message: ${form.message}`
             <MessageCircle size={18} /> Continue on WhatsApp <ArrowUpRight size={16} />
           </a>
         </div>
-        <p className="form-note">WhatsApp opens with your details pre-filled. You choose whether to send the message inside WhatsApp.</p>
       </form>
     </div>
   )
